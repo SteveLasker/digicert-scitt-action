@@ -1,15 +1,16 @@
 #!/bin/bash -l
 
-# echo "scitt-client_id:       " ${1}
-# echo "scitt-scitt-secret:    " ${2}
-# echo "feed:                  " ${3}
-# echo "payload:               " ${4}
-# echo "content-type:          " ${5}
-# echo "signed-statement-file: " ${6}
-# echo "receipt-file:          " ${7}
+# echo "datatrails-client_id:    " ${1}
+# echo "datatrails-secret:       " ${2}
+# echo "subject:                 " ${3}
+# echo "payload:                 " ${4}
+# echo "content-type:            " ${5}
+# echo "signed-statement-file:   " ${6}
+# echo "receipt-file:            " ${7}
 
 SIGNED_STATEMENT_FILE=./${6}
 TOKEN_FILE="./bearer-token.txt"
+SUBJECT=${3}
 
 # echo "Create an access token"
 /scripts/create-token.sh ${1} ${2} $TOKEN_FILE
@@ -22,7 +23,7 @@ ls -la $TOKEN_FILE
 echo "Sign statement with key protected in Software Trust Manager"
 
 python /scripts/create_signed_statement.py \
-  --feed ${3} \
+  --subject ${3} \
   --payload-file ${4} \
   --content-type ${5} \
   --output-file $SIGNED_STATEMENT_FILE
@@ -41,4 +42,4 @@ python /scripts/check_operation_status.py --operation-id $OPERATION_ID --token-f
 ENTRY_ID=$(python /scripts/check_operation_status.py --operation-id $OPERATION_ID --token-file-name $TOKEN_FILE)
 echo "ENTRY_ID :" $ENTRY_ID
 
-# curl https://app.datatrails.ai/archivist/v2/publicassets/-/events?event_attributes.feed_id=$FEED | jq
+# curl https://app.datatrails.ai/archivist/v2/publicassets/-/events?event_attributes.feed_id=$SUBJECT | jq

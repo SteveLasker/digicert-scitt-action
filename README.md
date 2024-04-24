@@ -9,17 +9,17 @@ This GitHub Action provides the ability to create and sign [SCITT](https://datat
 
 ## Action Inputs
 
-### `scitt-client_id`
+## `datatrails-client_id`
 
 **Required** The `CLIENT_ID` used to access the DataTrails SCITT APIs
 
-### `scitt-secret`
+## `datatrails-secret`
 
 **Required** The `SECRET` used to access the DataTrails SCITT APIs
 
-### `feed`
+## `subject`
 
-**Required** Unique ID for the collection of statements about an artifact. For more info, see `Feed` in the [IETF SCITT Terminology](https://datatracker.ietf.org/doc/html/draft-ietf-scitt-architecture#name-terminology).
+**Required** Unique ID for the collection of statements about an artifact. For more info, see `subject` in the [IETF SCITT Terminology](https://datatracker.ietf.org/doc/html/draft-ietf-scitt-architecture#name-terminology).
 
 ### `payload`
 
@@ -49,7 +49,7 @@ The Software Trust Manager API key
 
 ### DIGICERT_STM_API_BASE_URI
 
-The base URI of the Software Trust manager API
+The base URI of the Software Trust Manager API
 
 ### DIGICERT_STM_API_CLIENTAUTH_P12_B64
 
@@ -58,3 +58,4 @@ The base-64 encoded PKCS #12 file for client authentication to the Software Trus
 ### DIGICERT_STM_API_CLIENTAUTH_P12_PASSWORD
 
 The password for the PKCS #12 file for client authentication to the Software Trust Manager API
+

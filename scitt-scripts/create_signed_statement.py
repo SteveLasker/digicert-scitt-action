@@ -16,7 +16,7 @@ import digicert_stm_client
 import identity
 import key
 
-# Feed header label comes from version 2 of the scitt architecture document
+# subject header label comes from version 2 of the scitt architecture document
 # https://www.ietf.org/archive/id/draft-birkholz-scitt-architecture-02.html#name-envelope-and-claim-format
 HEADER_LABEL_FEED = 392
 
@@ -63,12 +63,12 @@ def open_payload(payload_file: str) -> str:
 def create_signed_statement(
     issuer: identity.Identity,
     payload: str,
-    feed: str,
+    subject: str,
     private_key: key.IssuerPrivateKey,
     content_type: str,
 ) -> bytes:
     """
-    creates a signed statement, given the private key, payload, feed and issuer
+    creates a signed statement, given the private key, payload, subject and issuer
     """
 
     ec_public_numbers = issuer.public_key.public_numbers()
@@ -82,11 +82,11 @@ def create_signed_statement(
         Algorithm: Es256,
         KID: issuer.kid.encode(),
         ContentType: content_type,
-        HEADER_LABEL_FEED: feed,
+        HEADER_LABEL_FEED: subject,
         X5t: issuer.x5t,
         HEADER_LABEL_CWT: {
             HEADER_LABEL_CWT_ISSUER: issuer.iss,
-            HEADER_LABEL_CWT_SUBJECT: feed,
+            HEADER_LABEL_CWT_SUBJECT: subject,
             HEADER_LABEL_CWT_CNF: {
                 HEADER_LABEL_CNF_COSE_KEY: {
                     KpKty: KtyEC2,
@@ -144,12 +144,12 @@ def main():
         default="application/json",
     )
 
-    # feed
+    # subject
     parser.add_argument(
-        "--feed",
+        "--subject",
         type=str,
         required=True,
-        help="feed to correlate statements made about an artifact.",
+        help="subject to correlate statements made about an artifact.",
     )
 
     # output file
@@ -169,9 +169,9 @@ def main():
     signed_statement = create_signed_statement(
         stm_client.retrieve_identity(),
         payload,
-        args.feed,
+        args.subject,
         digicert_stm_client.DigiCertStmPrivateKey(),
-        args.content_type,
+        args.content_type
     )
 
     with open(args.output_file, "wb") as output_file:
