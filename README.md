@@ -59,3 +59,72 @@ The base-64 encoded PKCS #12 file for client authentication to the Software Trus
 
 The password for the PKCS #12 file for client authentication to the Software Trust Manager API
 
+## Example usage
+
+The following example shows a minimal implementation.
+Pre-requisites:
+
+- A DigiCert [Software Trust Manager](https://www.digicert.com/software-trust-manager) or [Key Locker account](https://www.digicert.com/blog/announcing-certcentrals-new-keylocker)
+- A [DataTrails Subscription](https://www.datatrails.ai/getting-started/)
+- The following GitHub Action Secrets are required:
+  - `secrets.DATATRAILS_CLIENT_ID` - See [Creating Access Tokens Using a Custom Integration](https://docs.datatrails.ai/developers/developer-patterns/getting-access-tokens-using-app-registrations/)
+  - `secrets.DATATRAILS_SECRET` See above
+  - `secrets.DIGICERT_STM_CERTIFICATE_ID`
+  - `secrets.DIGICERT_STM_API_BASE_URI`
+  - `secrets.DIGICERT_STM_API_CLIENTAUTH_P12_PASSWORD`
+  - `secrets.DIGICERT_STM_API_CLIENTAUTH_P12_B64`
+  - `secrets.DIGICERT_STM_API_KEY`
+
+Sample github `digicert-datatrails-scitt-action.yml`
+
+```yaml
+name: Register a DigiCert Signed SCITT Statement on DataTrails
+
+on:
+  workflow_dispatch:
+  # push:
+  #   branches: [ "main" ]
+env:
+  DATATRAILS_CLIENT_ID: ${{ secrets.DATATRAILS_CLIENT_ID }}
+  DATATRAILS_SECRET: ${{ secrets.DATATRAILS_SECRET }}
+  DIGICERT_STM_CERTIFICATE_ID: ${{ secrets.DIGICERT_STM_CERTIFICATE_ID }}
+  DIGICERT_STM_API_BASE_URI: ${{ secrets.DIGICERT_STM_API_BASE_URI }}
+  DIGICERT_STM_API_CLIENTAUTH_P12_PASSWORD: ${{ secrets.DIGICERT_STM_API_CLIENTAUTH_P12_PASSWORD }}
+  DIGICERT_STM_API_CLIENTAUTH_P12_B64: ${{ secrets.DIGICERT_STM_API_CLIENTAUTH_P12_B64 }}
+  DIGICERT_STM_API_KEY: ${{ secrets.DIGICERT_STM_API_KEY }}
+jobs:
+  build-image-register-DataTrails-SCITT:
+    runs-on: ubuntu-latest
+    # Sets the permissions granted to the `GITHUB_TOKEN` for the actions in this job.
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Create buildOutput Directory
+        run: |
+          mkdir -p ./buildOutput/
+      - name: Create Compliance Statement
+        # A sample compliance file. Replace with an SBOM, in-toto statement, image for content authenticity, ...
+        run: |
+          echo '{"author": "fred", "title": "my biography", "reviews": "mixed"}' > ./buildOutput/attestation.json
+      - name: Register as a SCITT Signed Statement
+         # Register the Signed Statement with DataTrails SCITT APIs
+        id: register-compliance-scitt-signed-statement
+        uses: digicert/scitt-action@<TBD>
+        with:
+          datatrails-client_id: ${{ env.DATATRAILS_CLIENT_ID }}
+          datatrails-secret: ${{ env.DATATRAILS_SECRET }}
+          subject: ${{ github.server_url }}/${{ github.repository }}@${{ github.sha }}
+          payload: "./buildOutput/attestation.json"
+          content-type: "application/vnd.unknown.attestation+json"
+      - name: upload-signed-statement
+        uses: actions/upload-artifact@v4
+        with:
+          name: signed-statement
+          path: signed-statement.cbor
+      - name: upload-receipt
+        uses: actions/upload-artifact@v4
+        with:
+          name: receipt
+          path: receipt.cbor
+  ```
