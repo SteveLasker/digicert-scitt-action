@@ -43,7 +43,7 @@ echo "ENTRY_ID :" $ENTRY_ID
 
 echo "Download the SCITT Receipt: $7"
 
-curl -H @$HOME/.datatrails/bearer-token.txt \
+curl -H @$TOKEN_FILE \
   https://app.datatrails.ai/archivist/v1/publicscitt/entries/$ENTRY_ID/receipt \
   -o $7
 # curl https://app.datatrails.ai/archivist/v2/publicassets/-/events?event_attributes.feed_id=$SUBJECT | jq
