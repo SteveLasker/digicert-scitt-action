@@ -24,6 +24,10 @@ inputs:
     description: 'The file to save the cbor receipt'
     required: false
     default: 'receipt.cbor'
+  skip-receipt:
+    description: 'To skip receipt retrieval, set to 1'
+    required: false
+    default: '0'
 outputs:
   token: # id of output
     description: 'the token used to authenticate'
@@ -38,3 +42,4 @@ runs:
     - ${{ inputs.content-type }}
     - ${{ inputs.signed-statement-file }}
     - ${{ inputs.receipt-file }}
+    - ${{ inputs.skip-receipt}}

@@ -35,6 +35,16 @@ This GitHub Action provides the ability to create and sign [SCITT](https://datat
 See [Signed Statement Issuance and Registration](https://datatracker.ietf.org/doc/html/draft-ietf-scitt-architecture#name-signed-statement-issuance-a)
 **Default** 'signed-statement.cbor'
 
+### `receipt-file`
+
+**Optional** The filename to save the cbor receipt.
+**Default** 'receipt.cbor'
+
+### `skip-receipt`
+
+**Optional** To skip receipt retrieval, set to 1
+**Default** '0'
+
 ## Secrets
 
 This action requires secrets containing credentials and keypair information be configured. Specifically, the following secrets are required:
