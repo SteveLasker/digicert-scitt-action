@@ -8,23 +8,43 @@ echo "content-type:            " ${5}
 echo "signed-statement-file:   " ${6}
 echo "receipt-file:            " ${7}
 echo "skip-receipt:            " ${8}
-
+PAYLOAD_FILE=$4
 SIGNED_STATEMENT_FILE=./${6}
 TOKEN_FILE="./bearer-token.txt"
 SUBJECT=${3}
 
+if [ ! -f $PAYLOAD_FILE ]; then
+  echo "ERROR: Payload File: [$PAYLOAD_FILE] Not found!"
+  return 404
+fi
+
 # echo "Create an access token"
 /scripts/create-token.sh ${1} ${2} $TOKEN_FILE
+
+if [ ! -f $TOKEN_FILE ]; then
+  echo "ERROR: Token File: [$TOKEN_FILE] Not found!"
+  return 404
+fi
 
 echo "Sign a SCITT Statement with key protected in DigiCert Software Trust Manager"
 
 python /scripts/create_signed_statement.py \
   --subject ${3} \
-  --payload-file ${4} \
+  --payload-file $PAYLOAD_FILE \
   --content-type ${5} \
   --output-file $SIGNED_STATEMENT_FILE
 
+if [ ! -f $SIGNED_STATEMENT_FILE ]; then
+  echo "ERROR: Signed Statement: [$SIGNED_STATEMENT_FILE] Not found!"
+  return 404
+fi
+
 echo "SCITT Register to https://app.datatrails.ai/archivist/v1/publicscitt/entries"
+echo "TOKEN_FILE: $TOKEN_FILE"
+cat $TOKEN_FILE
+
+echo "SIGNED_STATEMENT_FILE: $SIGNED_STATEMENT_FILE"
+cat $SIGNED_STATEMENT_FILE
 
 OPERATION_ID=$(curl -X POST -H @$TOKEN_FILE \
                 --data-binary @$SIGNED_STATEMENT_FILE \
