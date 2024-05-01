@@ -41,11 +41,15 @@ fi
 
 echo "SCITT Register to https://app.datatrails.ai/archivist/v1/publicscitt/entries"
 
-OPERATION_ID=$(curl -X POST -H @$TOKEN_FILE \
+curl -X POST -H @$TOKEN_FILE \
+                --data-binary @$SIGNED_STATEMENT_FILE \
+                https://app.datatrails.ai/archivist/v1/publicscitt/entries
+
+# OPERATION_ID=$(curl -X POST -H @$TOKEN_FILE \
                 --data-binary @$SIGNED_STATEMENT_FILE \
                 https://app.datatrails.ai/archivist/v1/publicscitt/entries | jq -r .operationID)
 
-echo "OPERATION_ID :" $OPERATION_ID
+# echo "OPERATION_ID :" $OPERATION_ID
 
 echo "skip-receipt: $8"
 
