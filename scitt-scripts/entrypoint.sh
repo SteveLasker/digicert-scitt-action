@@ -2,11 +2,12 @@
 
 # echo "datatrails-client_id:    " ${1}
 # echo "datatrails-secret:       " ${2}
-# echo "subject:                 " ${3}
-# echo "payload:                 " ${4}
-# echo "content-type:            " ${5}
-# echo "signed-statement-file:   " ${6}
-# echo "receipt-file:            " ${7}
+echo "subject:                 " ${3}
+echo "payload:                 " ${4}
+echo "content-type:            " ${5}
+echo "signed-statement-file:   " ${6}
+echo "receipt-file:            " ${7}
+echo "skip-receipt:            " ${8}
 
 SIGNED_STATEMENT_FILE=./${6}
 TOKEN_FILE="./bearer-token.txt"
@@ -36,10 +37,15 @@ OPERATION_ID=$(curl -X POST -H @$TOKEN_FILE \
 
 echo "OPERATION_ID :" $OPERATION_ID
 
-echo "call: /scripts/check_operation_status.py"
-python /scripts/check_operation_status.py --operation-id $OPERATION_ID --token-file-name $TOKEN_FILE
 
-ENTRY_ID=$(python /scripts/check_operation_status.py --operation-id $OPERATION_ID --token-file-name $TOKEN_FILE)
-echo "ENTRY_ID :" $ENTRY_ID
+if [ -n "$1" ] && [ $1 = "1" ]; then
+  echo "skipping receipt retrieval"
+else
+  echo "call: /scripts/check_operation_status.py"
+  python /scripts/check_operation_status.py --operation-id $OPERATION_ID --token-file-name $TOKEN_FILE
+
+  ENTRY_ID=$(python /scripts/check_operation_status.py --operation-id $OPERATION_ID --token-file-name $TOKEN_FILE)
+  echo "ENTRY_ID :" $ENTRY_ID
+fi
 
 # curl https://app.datatrails.ai/archivist/v2/publicassets/-/events?event_attributes.feed_id=$SUBJECT | jq
