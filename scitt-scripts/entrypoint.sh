@@ -32,7 +32,7 @@ OPERATION_ID=$(curl -X POST -H @$TOKEN_FILE \
 
 echo "OPERATION_ID :" $OPERATION_ID
 
-if [ -n "$1" ] && [ $1 = "1" ]; then
+if [ -n "$8" ] && [ $1 = "8" ]; then
   echo "skipping receipt retrieval"
 else
   echo "Download the SCITT Receipt: $7"
