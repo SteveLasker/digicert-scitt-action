@@ -40,11 +40,6 @@ if [ ! -f $SIGNED_STATEMENT_FILE ]; then
 fi
 
 echo "SCITT Register to https://app.datatrails.ai/archivist/v1/publicscitt/entries"
-echo "TOKEN_FILE: $TOKEN_FILE"
-cat $TOKEN_FILE
-
-echo "SIGNED_STATEMENT_FILE: $SIGNED_STATEMENT_FILE"
-cat $SIGNED_STATEMENT_FILE
 
 OPERATION_ID=$(curl -X POST -H @$TOKEN_FILE \
                 --data-binary @$SIGNED_STATEMENT_FILE \
@@ -52,7 +47,9 @@ OPERATION_ID=$(curl -X POST -H @$TOKEN_FILE \
 
 echo "OPERATION_ID :" $OPERATION_ID
 
-if [ -n "$8" ] && [ $1 = "8" ]; then
+echo "skip-receipt: $8"
+
+if [ -n "$8" ] && [ $8 = "1" ]; then
   echo "skipping receipt retrieval"
 else
   echo "Download the SCITT Receipt: $7"
