@@ -2,12 +2,13 @@
 
 # echo "datatrails-client_id:    " ${1}
 # echo "datatrails-secret:       " ${2}
-echo "subject:                 " ${3}
-echo "payload:                 " ${4}
-echo "content-type:            " ${5}
-echo "signed-statement-file:   " ${6}
-echo "receipt-file:            " ${7}
-echo "skip-receipt:            " ${8}
+# echo "subject:                 " ${3}
+# echo "payload:                 " ${4}
+# echo "content-type:            " ${5}
+# echo "signed-statement-file:   " ${6}
+# echo "receipt-file:            " ${7}
+# echo "skip-receipt:            " ${8}
+
 PAYLOAD_FILE=$4
 SIGNED_STATEMENT_FILE=./${6}
 TOKEN_FILE="./bearer-token.txt"
@@ -28,7 +29,7 @@ fi
 
 echo "Sign a SCITT Statement with key protected in DigiCert Software Trust Manager"
 
-python /scripts/create_signed_statement.py \
+python /scripts/create_hashed_signed_statement.py \
   --subject ${3} \
   --payload-file $PAYLOAD_FILE \
   --content-type ${5} \
@@ -39,17 +40,11 @@ if [ ! -f $SIGNED_STATEMENT_FILE ]; then
   return 404
 fi
 
-echo "SCITT Register to https://app.datatrails.ai/archivist/v1/publicscitt/entries"
+echo "Register the SCITT SIgned Statement to https://app.datatrails.ai/archivist/v1/publicscitt/entries"
 
 curl -X POST -H @$TOKEN_FILE \
                 --data-binary @$SIGNED_STATEMENT_FILE \
                 https://app.datatrails.ai/archivist/v1/publicscitt/entries
-
-# OPERATION_ID=$(curl -X POST -H @$TOKEN_FILE \
-#                --data-binary @$SIGNED_STATEMENT_FILE \
-#                https://app.datatrails.ai/archivist/v1/publicscitt/entries | jq -r .operationID)
-
-# echo "OPERATION_ID :" $OPERATION_ID
 
 echo "skip-receipt: $8"
 
@@ -67,4 +62,4 @@ else
     -o $7
 fi
 
-# curl https://app.datatrails.ai/archivist/v2/publicassets/-/events?event_attributes.feed_id=$SUBJECT | jq
+# curl https://app.datatrails.ai/archivist/v2/publicassets/-/events?event_attributes.subject=$SUBJECT | jq
