@@ -38,10 +38,10 @@ fi
 echo "Sign a SCITT Statement with key protected in DigiCert Software Trust Manager"
 
 python /scripts/create_signed_statement.py \
-  --subject $SUBJECT \
-  --payload-file $PAYLOAD_FILE \
   --content-type $CONTENT_TYPE \
+  --payload-file $PAYLOAD_FILE \
   --payload-location $PAYLOAD_LOCATION \
+  --subject $SUBJECT \
   --output-file $SIGNED_STATEMENT_FILE
 
 if [ ! -f $SIGNED_STATEMENT_FILE ]; then
@@ -51,9 +51,13 @@ fi
 
 echo "Register the SCITT SIgned Statement to https://app.datatrails.ai/archivist/v1/publicscitt/entries"
 
-curl -X POST -H @$TOKEN_FILE \
+RESPONSE=$(curl -X POST -H @$TOKEN_FILE \
                 --data-binary @$SIGNED_STATEMENT_FILE \
-                https://app.datatrails.ai/archivist/v1/publicscitt/entries
+                https://app.datatrails.ai/archivist/v1/publicscitt/entries)
+echo "RESPONSE: $RESPONSE"
+
+OPERATION_ID=$(echo $RESPONSE | jq  -r .operationID)
+echo "OPERATION_ID: $OPERATION_ID"
 
 echo "skip-receipt: $SKIP_RECEIPT"
 
