@@ -4,12 +4,16 @@ import argparse
 import hashlib
 import json
 
-from ecdsa import SigningKey
+from typing import Optional
+from hashlib import sha256
+from ecdsa import SigningKey, VerifyingKey
 from pycose.algorithms import Es256
 from pycose.headers import Algorithm, KID, ContentType, X5t, X5chain
 from pycose.keys.curves import P256
-from pycose.keys.keyparam import KpKty, EC2KpX, EC2KpY, EC2KpCurve
+from pycose.keys.keyops import SignOp, VerifyOp
+from pycose.keys.keyparam import KpKty, EC2KpD, EC2KpX, EC2KpY, KpKeyOps, EC2KpCurve
 from pycose.keys.keytype import KtyEC2
+from pycose.keys import CoseKey
 from pycose.messages import Sign1Message
 
 import digicert_stm_client
@@ -34,11 +38,17 @@ HEADER_LABEL_CWT_SUBJECT = 2
 HEADER_LABEL_CWT_CNF = 8
 HEADER_LABEL_CNF_COSE_KEY = 1
 
+# Signed Hash envelope header labels from:
+# https://github.com/OR13/draft-steele-cose-hash-envelope/blob/main/draft-steele-cose-hash-envelope.md
+HEADER_LABEL_PAYLOAD_HASH_ALGORITHM = 998
+HEADER_LABEL_LOCATION = 999
 
 def open_signing_key(key_file: str) -> SigningKey:
     """
     opens the signing key from the key file.
     NOTE: the signing key is expected to be a P-256 ecdsa key in PEM format.
+    While this sample script uses P-256 ecdsa, DataTrails supports any format
+    supported through [go-cose](https://github.com/veraison/go-cose/blob/main/algorithm.go)
     """
     with open(key_file, encoding="UTF-8") as file:
         signing_key = SigningKey.from_pem(file.read(), hashlib.sha256)
@@ -48,16 +58,9 @@ def open_signing_key(key_file: str) -> SigningKey:
 def open_payload(payload_file: str) -> str:
     """
     opens the payload from the payload file.
-    NOTE: the payload is expected to be in json format.
-          however, any payload of type bytes is allowed.
     """
     with open(payload_file, encoding="UTF-8") as file:
-        payload = json.loads(file.read())
-
-        # convert the payload to a cose sign1 payload
-        payload = json.dumps(payload, ensure_ascii=False)
-
-        return payload
+        return file.read()
 
 
 def create_signed_statement(
@@ -66,9 +69,11 @@ def create_signed_statement(
     subject: str,
     private_key: key.IssuerPrivateKey,
     content_type: str,
+    location: str,
 ) -> bytes:
     """
     creates a signed statement, given the private key, payload, subject and issuer
+    the payload will be hashed and the hash added to the payload field.
     """
 
     ec_public_numbers = issuer.public_key.public_numbers()
@@ -82,7 +87,6 @@ def create_signed_statement(
         Algorithm: Es256,
         KID: issuer.kid.encode(),
         ContentType: content_type,
-        HEADER_LABEL_FEED: subject,
         X5t: issuer.x5t,
         HEADER_LABEL_CWT: {
             HEADER_LABEL_CWT_ISSUER: issuer.iss,
@@ -96,18 +100,25 @@ def create_signed_statement(
                 },
             },
         },
+        HEADER_LABEL_PAYLOAD_HASH_ALGORITHM: -16,  # for sha256
+        HEADER_LABEL_LOCATION: location,
     }
 
     unprotected_header = {
         X5chain: issuer.x5chain
     }
 
+    # now create a sha256 hash of the payload
+    #
+    # NOTE: any hashing algorithm can be used.
+    payload_hash = sha256(payload.encode("utf-8")).digest()
+
     # create the statement as a sign1 message using the protected header,
     # unprotected header, and payload
     statement = Sign1Message(
         phdr=protected_header,
         uhdr=unprotected_header,
-        payload=payload.encode("utf-8")
+        payload=payload_hash
     )
 
     # HACK: get TBS
@@ -144,6 +155,13 @@ def main():
         default="application/json",
     )
 
+    # location hint
+    parser.add_argument(
+        "--location-hint",
+        type=str,
+        help="location hint for the original statement that was hashed.",
+    )
+
     # subject
     parser.add_argument(
         "--subject",
@@ -171,7 +189,8 @@ def main():
         payload,
         args.subject,
         digicert_stm_client.DigiCertStmPrivateKey(),
-        args.content_type
+        args.content_type,
+        args.location_hint
     )
 
     with open(args.output_file, "wb") as output_file:
