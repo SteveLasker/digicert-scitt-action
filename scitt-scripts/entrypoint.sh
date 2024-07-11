@@ -3,26 +3,22 @@
 # echo "content-type:            " ${1}
 # echo "datatrails-client_id:    " ${2}
 # echo "datatrails-secret:       " ${3}
-# echo "issuer:                  " ${4}
-# echo "subject:                 " ${5}
-# echo "payload-file:            " ${6}
-# echo "payload-location:        " ${7}
-# echo "receipt-file:            " ${8}
-# echo "signed-statement-file:   " ${9}
-# echo "signing-key-file:        " ${10}
-# echo "skip-receipt:            " ${11}
+# echo "payload-file:            " ${4}
+# echo "payload-location:        " ${5}
+# echo "receipt-file:            " ${6}
+# echo "signed-statement-file:   " ${7}
+# echo "skip-receipt:            " ${8}
+# echo "subject:                 " ${9}
 
 CONTENT_TYPE=${1}
 DATATRAILS_CLIENT_ID=${2}
 DATATRAILS_SECRET_ID=${3}
-ISSUER=${4}
-SUBJECT=${5}
-PAYLOAD_FILE=${6}
-PAYLOAD_LOCATION=${7}
-RECEIPT_FILE=${8}
-SIGNED_STATEMENT_FILE=${9}
-SIGNING_KEY_FILE=${10}
-SKIP_RECEIPT=${11}
+PAYLOAD_FILE=${4}
+PAYLOAD_LOCATION=${5}
+RECEIPT_FILE=${6}
+SIGNED_STATEMENT_FILE=${7}
+SKIP_RECEIPT=${8}
+SUBJECT=${9}
 
 TOKEN_FILE="./bearer-token.txt"
 

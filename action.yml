@@ -10,10 +10,10 @@ inputs:
   datatrails-secret:
     description: 'The SECRET used to access the DataTrails SCITT APIs'
     required: true
-  payload:
+  payload-file:
     description: 'The payload file to be registered on the SCITT Service (eg: SBOM, Scan Result, Attestation)'
     required: true
-  payload_location:
+  payload-location:
     description: 'Optional location the content of the payload may be stored.'
     required: false
   receipt-file:
@@ -38,12 +38,12 @@ runs:
   using: 'docker'
   image: 'Dockerfile'
   args:
+    - ${{ inputs.content-type }}
     - ${{ inputs.datatrails-client_id }}
     - ${{ inputs.datatrails-secret }}
-    - ${{ inputs.subject }}
-    - ${{ inputs.payload }}
-    - ${{ inputs.content-type }}
-    - ${{ inputs.signed-statement-file }}
-    - ${{ inputs.receipt-file }}
-    - ${{ inputs.skip-receipt}}
+    - ${{ inputs.payload-file }}
     - ${{ inputs.payload-location}}
+    - ${{ inputs.receipt-file }}
+    - ${{ inputs.signed-statement-file }}
+    - ${{ inputs.skip-receipt }}
+    - ${{ inputs.subject }}
