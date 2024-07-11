@@ -69,7 +69,7 @@ def create_signed_statement(
     subject: str,
     private_key: key.IssuerPrivateKey,
     content_type: str,
-    location: str,
+    payload_location: str,
 ) -> bytes:
     """
     creates a signed statement, given the private key, payload, subject and issuer
@@ -138,6 +138,14 @@ def main():
 
     parser = argparse.ArgumentParser(description="Create a signed statement.")
 
+    # content-type
+    parser.add_argument(
+        "--content-type",
+        type=str,
+        help="The iana.org media type for the payload",
+        default="application/json",
+    )
+
     # payload-file (a reference to the file that will become the payload of the SCITT Statement)
     parser.add_argument(
         "--payload-file",
@@ -147,17 +155,9 @@ def main():
         default="scitt-payload.json",
     )
 
-    # content-type
+    # payload-location
     parser.add_argument(
-        "--content-type",
-        type=str,
-        help="The iana.org media type for the payload",
-        default="application/json",
-    )
-
-    # location hint
-    parser.add_argument(
-        "--location-hint",
+        "--payload-location",
         type=str,
         help="location hint for the original statement that was hashed.",
     )
@@ -185,13 +185,14 @@ def main():
     stm_client = digicert_stm_client.DigiCertSoftwareTrustManagerClient()
 
     signed_statement = create_signed_statement(
-        stm_client.retrieve_identity(),
-        payload,
-        args.subject,
-        digicert_stm_client.DigiCertStmPrivateKey(),
-        args.content_type,
-        args.location_hint
+        issuer=stm_client.retrieve_identity(),
+        payload=payload,
+        subject=args.subject,
+        private_key=digicert_stm_client.DigiCertStmPrivateKey(),
+        content_type=args.content_type,
+        payload_location=args.payload_location
     )
+
 
     with open(args.output_file, "wb") as output_file:
         output_file.write(signed_statement)
