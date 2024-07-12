@@ -1,14 +1,14 @@
 #!/bin/bash -l
 
-echo "content-type:            " ${1}
-echo "datatrails-client_id:    " ${2}
-echo "datatrails-secret:       " ${3}
-echo "payload-file:            " ${4}
-echo "payload-location:        " ${5}
-echo "receipt-file:            " ${6}
-echo "signed-statement-file:   " ${7}
-echo "skip-receipt:            " ${8}
-echo "subject:                 " ${9}
+# echo "content-type:            " ${1}
+# echo "datatrails-client_id:    " ${2}
+# echo "datatrails-secret:       " ${3}
+# echo "payload-file:            " ${4}
+# echo "payload-location:        " ${5}
+# echo "receipt-file:            " ${6}
+# echo "signed-statement-file:   " ${7}
+# echo "skip-receipt:            " ${8}
+# echo "subject:                 " ${9}
 
 CONTENT_TYPE=${1}
 DATATRAILS_CLIENT_ID=${2}
