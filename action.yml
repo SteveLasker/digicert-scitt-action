@@ -17,7 +17,7 @@ inputs:
     description: 'Optional location the content of the payload may be stored.'
     required: false
   receipt-file:
-    description: 'The file to save the cbor receipt'
+    description: 'The filename to save the cbor receipt'
     required: false
     default: 'receipt.cbor'
   signed-statement-file:
