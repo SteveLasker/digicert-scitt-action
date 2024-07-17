@@ -1,5 +1,7 @@
 #!/bin/bash -l
 
+set -e
+
 # echo "content-type:            " ${1}
 # echo "datatrails-client_id:    " ${2}
 # echo "datatrails-secret:       " ${3}
@@ -24,7 +26,7 @@ TOKEN_FILE="./bearer-token.txt"
 
 if [ ! -f $PAYLOAD_FILE ]; then
   echo "ERROR: Payload File: [$PAYLOAD_FILE] Not found!"
-  return 404
+  exit 126
 fi
 
 # echo "Create an access token"
@@ -32,7 +34,7 @@ fi
 
 if [ ! -f $TOKEN_FILE ]; then
   echo "ERROR: Token File: [$TOKEN_FILE] Not found!"
-  return 404
+  exit 126
 fi
 
 echo "Sign a SCITT Statement with key protected in DigiCert Software Trust Manager"
@@ -46,7 +48,7 @@ python /scripts/create_signed_statement.py \
 
 if [ ! -f $SIGNED_STATEMENT_FILE ]; then
   echo "ERROR: Signed Statement: [$SIGNED_STATEMENT_FILE] Not found!"
-  return 404
+  exit 126
 fi
 
 echo "Register the SCITT SIgned Statement to https://app.datatrails.ai/archivist/v1/publicscitt/entries"
@@ -54,6 +56,7 @@ echo "Register the SCITT SIgned Statement to https://app.datatrails.ai/archivist
 RESPONSE=$(curl -X POST -H @$TOKEN_FILE \
                 --data-binary @$SIGNED_STATEMENT_FILE \
                 https://app.datatrails.ai/archivist/v1/publicscitt/entries)
+
 echo "RESPONSE: $RESPONSE"
 
 OPERATION_ID=$(echo $RESPONSE | jq  -r .operationID)
