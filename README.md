@@ -2,6 +2,10 @@
 
 This GitHub Action provides the ability to create and sign [SCITT](https://datatracker.ietf.org/wg/scitt/about/) statements using code signing keys protected by DigiCert [Software Trust Manager](https://www.digicert.com/software-trust-manager) and register these statements to a SCITT transparency service operated by [DataTrails](https://www.datatrails.ai/).
 
+**NOTE:**:  
+This SCITT GitHub Action is in Preview, pending adoption of the [SCITT Reference APIs (SCRAPI)](https://datatracker.ietf.org/doc/draft-ietf-scitt-scrapi/).
+To use a production supported implementation, please contact [DataTrails](https://www.datatrails.ai/contactus/) for more info.
+
 ## Getting Started
 
 1. Generate a keypair and corresponding end-entity certificate in [Software Trust Manager](https://www.digicert.com/software-trust-manager)
