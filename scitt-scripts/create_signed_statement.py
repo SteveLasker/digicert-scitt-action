@@ -45,6 +45,11 @@ HEADER_LABEL_CNF_COSE_KEY = 1
 HEADER_LABEL_PAYLOAD_HASH_ALGORITHM = -6800
 HEADER_LABEL_LOCATION = -6801
 
+# CBOR Object Signing and Encryption (COSE) "typ" (type) Header Parameter
+# https://datatracker.ietf.org/doc/rfc9596/
+HEADER_LABEL_TYPE = 16
+COSE_TYPE="application/hashed+cose"
+
 def open_signing_key(key_file: str) -> SigningKey:
     """
     opens the signing key from the key file.
@@ -86,6 +91,7 @@ def create_signed_statement(
     # create a protected header where
     #  the verification key is attached to the cwt claims
     protected_header = {
+        HEADER_LABEL_TYPE: COSE_TYPE,
         Algorithm: Es256,
         KID: issuer.kid.encode(),
         ContentType: content_type,
@@ -187,12 +193,12 @@ def main():
     stm_client = digicert_stm_client.DigiCertSoftwareTrustManagerClient()
 
     signed_statement = create_signed_statement(
+        content_type=args.content_type,
         issuer=stm_client.retrieve_identity(),
         payload=payload,
-        subject=args.subject,
+        payload_location=args.payload_location,
         private_key=digicert_stm_client.DigiCertStmPrivateKey(),
-        content_type=args.content_type,
-        payload_location=args.payload_location
+        subject=args.subject
     )
 
 
