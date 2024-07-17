@@ -65,8 +65,6 @@ echo "OPERATION_ID: $OPERATION_ID"
 if [ ${#OPERATION_ID} -lt 1 ]; then
   echo "error: OPERATION_ID not found. POST to https://app.datatrails.ai/archivist/v1/publicscitt/entries failed"
   exit 126
-else
-  exit 0
 fi
 
 echo "skip-receipt: $SKIP_RECEIPT"
