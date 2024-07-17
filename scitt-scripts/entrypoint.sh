@@ -62,6 +62,13 @@ echo "RESPONSE: $RESPONSE"
 OPERATION_ID=$(echo $RESPONSE | jq  -r .operationID)
 echo "OPERATION_ID: $OPERATION_ID"
 
+if [ ${#OPERATION_ID} -lt 1 ]; then
+  echo "error: OPERATION_ID not found. POST to https://app.datatrails.ai/archivist/v1/publicscitt/entries failed"
+  exit 126
+else
+  exit 0
+fi
+
 echo "skip-receipt: $SKIP_RECEIPT"
 
 if [ -n "$SKIP_RECEIPT" ] && [ $SKIP_RECEIPT = "1" ]; then
@@ -73,6 +80,12 @@ else
 
   ENTRY_ID=$(python /scripts/check_operation_status.py --operation-id $OPERATION_ID --token-file-name $TOKEN_FILE)
   echo "ENTRY_ID :" $ENTRY_ID
+
+  if [ ${#ENTRY_ID} -lt 1 ]; then
+    echo "error: ENTRY_ID not found. check_operation_status.py failed"
+    exit 126
+  fi
+
   curl -H @$TOKEN_FILE \
     https://app.datatrails.ai/archivist/v1/publicscitt/entries/$ENTRY_ID/receipt \
     -o $RECEIPT_FILE
