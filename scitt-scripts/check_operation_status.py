@@ -129,9 +129,6 @@ def main():
 
     headers = get_token_from_file(args.token_file_name)
 
-    entry_id = poll_operation_status(args.operation_id, headers)
-    print(entry_id, flush=True)
-
     try:
         entry_id = poll_operation_status(args.operation_id, headers, logger)
         print(entry_id)
