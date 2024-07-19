@@ -51,7 +51,7 @@ if [ ! -f $SIGNED_STATEMENT_FILE ]; then
   exit 126
 fi
 
-echo "Register the SCITT SIgned Statement to https://app.datatrails.ai/archivist/v1/publicscitt/entries"
+echo "Register the SCITT Signed Statement to https://app.datatrails.ai/archivist/v1/publicscitt/entries"
 
 RESPONSE=$(curl -X POST -H @$TOKEN_FILE \
                 --data-binary @$SIGNED_STATEMENT_FILE \
