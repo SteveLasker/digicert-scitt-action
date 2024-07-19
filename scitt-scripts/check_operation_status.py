@@ -128,11 +128,6 @@ def main():
     logging.basicConfig(level=logging.getLevelName(args.log_level))
 
     headers = get_token_from_file(args.token_file_name)
-    # print("headers:", flush=True)
-    # print(headers, flush=True)
-
-    # print("operation_id:", flush=True)
-    # print(args.operation_id, flush=True)
 
     entry_id = poll_operation_status(args.operation_id, headers)
     print(entry_id, flush=True)
