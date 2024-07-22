@@ -35,11 +35,10 @@ runs:
   using: 'docker'
   image: 'Dockerfile'
   args:
-    - ${{ inputs.datatrails-client_id }}
-    - ${{ inputs.datatrails-secret }}
-    - ${{ inputs.subject }}
-    - ${{ inputs.payload }}
     - ${{ inputs.content-type }}
-    - ${{ inputs.signed-statement-file }}
-    - ${{ inputs.receipt-file }}
-    - ${{ inputs.skip-receipt}}
+    - ${{ inputs.datatrails-client_id }}
+    - ${{ inputs.datatrails-client_secret }}
+    - ${{ inputs.payload-file }}
+    - ${{ inputs.payload-location }}
+    - ${{ inputs.subject }}
+    - ${{ inputs.transparent-statement-file }}

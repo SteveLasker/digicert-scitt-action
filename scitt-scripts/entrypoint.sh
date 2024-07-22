@@ -1,70 +1,60 @@
 #!/bin/bash -l
 
-# echo "datatrails-client_id:    " ${1}
-# echo "datatrails-secret:       " ${2}
-echo "subject:                 " ${3}
-echo "payload:                 " ${4}
-echo "content-type:            " ${5}
-echo "signed-statement-file:   " ${6}
-echo "receipt-file:            " ${7}
-echo "skip-receipt:            " ${8}
-PAYLOAD_FILE=$4
-SIGNED_STATEMENT_FILE=./${6}
+# echo "content-type:              " ${1}
+# echo "datatrails-client_id:      " ${2}
+# echo "datatrails-client_secret:  " ${3}
+# echo "payload-file:              " ${4}
+# echo "payload-location"          " ${5}
+# echo "subject:                   " ${6}
+# echo "transparent-statement-file:" ${7}
+
+CONTENT_TYPE=${1}
+export DATATRAILS_CLIENT_ID=${2}
+export DATATRAILS_CLIENT_SECRET=${3}
+PAYLOAD_FILE=${4}
+PAYLOAD_LOCATION=${5}
+SUBJECT=${6}
+TRANSPARENT_STATEMENT_FILE=${7}
+
+SIGNED_STATEMENT_FILE="signed-statement.cbor"
 TOKEN_FILE="./bearer-token.txt"
-SUBJECT=${3}
 
 if [ ! -f $PAYLOAD_FILE ]; then
   echo "ERROR: Payload File: [$PAYLOAD_FILE] Not found!"
-  return 404
+  exit 126
 fi
 
 # echo "Create an access token"
-/scripts/create-token.sh ${1} ${2} $TOKEN_FILE
+/scripts/create-token.sh $DATATRAILS_CLIENT_ID \
+  $DATATRAILS_CLIENT_SECRET \
+  $TOKEN_FILE
 
 if [ ! -f $TOKEN_FILE ]; then
   echo "ERROR: Token File: [$TOKEN_FILE] Not found!"
-  return 404
+  exit 126
 fi
 
 echo "Sign a SCITT Statement with key protected in DigiCert Software Trust Manager"
 
 python /scripts/create_signed_statement.py \
-  --subject ${3} \
+  --subject $SUBJECT \
   --payload-file $PAYLOAD_FILE \
-  --content-type ${5} \
+  --content-type $CONTENT_TYPE \
   --output-file $SIGNED_STATEMENT_FILE
 
 if [ ! -f $SIGNED_STATEMENT_FILE ]; then
   echo "ERROR: Signed Statement: [$SIGNED_STATEMENT_FILE] Not found!"
-  return 404
+  exit 126
 fi
 
-echo "SCITT Register to https://app.datatrails.ai/archivist/v1/publicscitt/entries"
+echo "Register the SCITT Signed Statement to https://app.datatrails.ai/archivist/v1/publicscitt/entries"
 
-curl -X POST -H @$TOKEN_FILE \
-                --data-binary @$SIGNED_STATEMENT_FILE \
-                https://app.datatrails.ai/archivist/v1/publicscitt/entries
+python /scripts/register_signed_statement.py \
+      --signed-statement-file $SIGNED_STATEMENT_FILE \
+      --output-file $TRANSPARENT_STATEMENT_FILE \
+      --log-level INFO
 
-# OPERATION_ID=$(curl -X POST -H @$TOKEN_FILE \
-#                --data-binary @$SIGNED_STATEMENT_FILE \
-#                https://app.datatrails.ai/archivist/v1/publicscitt/entries | jq -r .operationID)
-
-# echo "OPERATION_ID :" $OPERATION_ID
-
-echo "skip-receipt: $8"
-
-if [ -n "$8" ] && [ $8 = "1" ]; then
-  echo "skipping receipt retrieval"
-else
-  echo "Download the SCITT Receipt: $7"
-  echo "call: /scripts/check_operation_status.py"
-  python /scripts/check_operation_status.py --operation-id $OPERATION_ID --token-file-name $TOKEN_FILE
-
-  ENTRY_ID=$(python /scripts/check_operation_status.py --operation-id $OPERATION_ID --token-file-name $TOKEN_FILE)
-  echo "ENTRY_ID :" $ENTRY_ID
-  curl -H @$TOKEN_FILE \
-    https://app.datatrails.ai/archivist/v1/publicscitt/entries/$ENTRY_ID/receipt \
-    -o $7
-fi
+python /scripts/dump_cbor.py \
+      --input $TRANSPARENT_STATEMENT_FILE
 
 # curl https://app.datatrails.ai/archivist/v2/publicassets/-/events?event_attributes.feed_id=$SUBJECT | jq
