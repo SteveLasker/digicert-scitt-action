@@ -1,53 +1,57 @@
 # GitHub Action for creating and registering SCITT statements with Software Trust Manager and DataTrails
 
-This GitHub Action provides the ability to create and sign [SCITT](https://datatracker.ietf.org/wg/scitt/about/) statements using code signing keys protected by DigiCert [Software Trust Manager](https://www.digicert.com/software-trust-manager) and submit these statements to the transparency service operated by [DataTrails](https://www.datatrails.ai/).
+This GitHub Action provides the ability to create and sign [SCITT](https://datatracker.ietf.org/wg/scitt/about/) statements using code signing keys protected by DigiCert [Software Trust Manager](https://www.digicert.com/software-trust-manager) and register these statements to a SCITT transparency service operated by [DataTrails](https://www.datatrails.ai/).
+
+**NOTE:**:  
+This SCITT GitHub Action is in Preview, pending adoption of the [SCITT Reference APIs (SCRAPI)](https://datatracker.ietf.org/doc/draft-ietf-scitt-scrapi/).
+To use a production supported implementation, please contact [DataTrails](https://www.datatrails.ai/contactus/) for more info.
 
 ## Getting Started
 
 1. Generate a keypair and corresponding end-entity certificate in [Software Trust Manager](https://www.digicert.com/software-trust-manager)
-2. [Create an account](https://app.datatrails.ai/signup) at DataTrails and [create an access token](https://docs.datatrails.ai/developers/developer-patterns/getting-access-tokens-using-app-registrations/)
+1. [Create an account](https://app.datatrails.ai/signup) at DataTrails and [create an access token](https://docs.datatrails.ai/developers/developer-patterns/getting-access-tokens-using-app-registrations/)
+1. Configure a GitHub SCITT Action, with the following [Inputs](#action-inputs) and [Example](#example-usage)
 
 ## Action Inputs
 
-## `datatrails-client_id`
-
-**Required** The `DATATRAILS_CLIENT_ID` used to access the DataTrails SCITT APIs
-
-## `datatrails-client_secret`
-
-**Required** The `DATATRAILS_CLIENT_SECRET` used to access the DataTrails SCITT APIs
-
-## `subject`
-
-**Required** Unique ID for the collection of statements about an artifact. For more info, see `subject` in the [IETF SCITT Terminology](https://datatracker.ietf.org/doc/html/draft-ietf-scitt-architecture#name-terminology).
-
-### `payload`
-
-**Required** The payload file to be registered on the SCITT Service (SBOM, Scan Result, Attestation, etc.)
-
 ### `content-type`
 
-**Required** The payload content type (IANA media type) to be registered on the SCITT Service. For example: `application/spdx+json`
+**Required** The payload content type (iana mediaType) to be registered on the SCITT Service (eg: application/spdx+json, application/vnd.cyclonedx+json, Scan Result, Attestation)
 
-### `signed-statement-file`
+### `payload-file`
 
-**Optional** A required file representing the signed SCITT Statement that will be registered with the SCITT Transparency Service. The parameter is optional, as it provides a default file name.  
-See [Signed Statement Issuance and Registration](https://datatracker.ietf.org/doc/html/draft-ietf-scitt-architecture#name-signed-statement-issuance-a)
-**Default** 'signed-statement.cbor'
+**Required** The payload file to be registered on the SCITT Service (eg: SBOM, Scan Result, Attestation)
 
-### `receipt-file`
+### `payload-location`
 
-**Optional** The filename to save the cbor receipt.
-**Default** 'receipt.cbor'
+**Optional** Location the content of the payload may be stored.
 
-### `skip-receipt`
+    description: 'The filename to save the cbor transparent statement, which includes the signed-statement and the receipt'
+    required: false
+    default: 'transparent-statement.cbor'
 
-**Optional** To skip receipt retrieval, set to 1
-**Default** '0'
+### `subject`
+
+**Required** Unique ID for the collection of statements about an artifact.
+For more info, see `subject` in the [IETF SCITT Terminology](https://datatracker.ietf.org/doc/html/draft-ietf-scitt-architecture#name-terminology).
+
+### `transparent-statement-file`
+
+**Optional** The filename to save the transparent statement, which includes the signed-statement and the receipt
+**Default** 'transparent-statement.cbor'
 
 ## Secrets
 
-This action requires secrets containing credentials and keypair information be configured. Specifically, the following secrets are required:
+This action requires secrets containing credentials and keypair information be configured.
+Specifically, the following secrets are required:
+
+### `DATATRAILS_CLIENT_ID`
+
+The `CLIENT_ID` used to access the DataTrails SCITT APIs
+
+### `DATATRAILS_CLIENT_SECRET`
+
+**Required** The `SECRET` used to access the DataTrails SCITT APIs
 
 ### DIGICERT_STM_CERTIFICATE_ID
 
@@ -117,17 +121,23 @@ jobs:
         # A sample compliance file. Replace with an SBOM, in-toto statement, image for content authenticity, ...
         run: |
           echo '{"author": "fred", "title": "my biography", "reviews": "mixed"}' > ./buildOutput/attestation.json
-      - name: Register as a SCITT Signed Statement
-         # Register the Signed Statement with DataTrails SCITT APIs
+      - name: Upload Attestation
+        id: upload-attestation
+        uses: actions/upload-artifact@v4
+        with:
+          name: attestation.json
+          path: ./buildOutput/attestation.json
+      - name: Sign & Register as a SCITT Signed Statement
+         # Register the DigiCert Signed Statement with the DataTrails SCITT APIs
         id: register-compliance-scitt-signed-statement
         uses: digicert/scitt-action@v0.4
         with:
+          content-type: "application/vnd.unknown.attestation+json"
           datatrails-client_id: ${{ env.DATATRAILS_CLIENT_ID }}
           datatrails-client_secret: ${{ env.DATATRAILS_CLIENT_SECRET }}
-          subject: ${{ github.server_url }}/${{ github.repository }}@${{ github.sha }}
           payload-file: "./buildOutput/attestation.json"
-          payload-location: 
-          content-type: "application/vnd.unknown.attestation+json"
+          payload-location: ${{ steps.upload-attestation.outputs.artifact-url }}
+          subject: ${{ github.server_url }}/${{ github.repository }}@${{ github.sha }}
       - name: upload-transparent-statement
         uses: actions/upload-artifact@v4
         with:
