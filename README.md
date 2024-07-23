@@ -11,11 +11,11 @@ This GitHub Action provides the ability to create and sign [SCITT](https://datat
 
 ## `datatrails-client_id`
 
-**Required** The `CLIENT_ID` used to access the DataTrails SCITT APIs
+**Required** The `DATATRAILS_CLIENT_ID` used to access the DataTrails SCITT APIs
 
-## `datatrails-secret`
+## `datatrails-client_secret`
 
-**Required** The `SECRET` used to access the DataTrails SCITT APIs
+**Required** The `DATATRAILS_CLIENT_SECRET` used to access the DataTrails SCITT APIs
 
 ## `subject`
 
@@ -78,7 +78,7 @@ Pre-requisites:
 - A [DataTrails Subscription](https://www.datatrails.ai/getting-started/)
 - The following GitHub Action Secrets are required:
   - `secrets.DATATRAILS_CLIENT_ID` - See [Creating Access Tokens Using a Custom Integration](https://docs.datatrails.ai/developers/developer-patterns/getting-access-tokens-using-app-registrations/)
-  - `secrets.DATATRAILS_SECRET` See above
+  - `secrets.DATATRAILS_CLIENT_SECRET` See above
   - `secrets.DIGICERT_STM_CERTIFICATE_ID`
   - `secrets.DIGICERT_STM_API_BASE_URI`
   - `secrets.DIGICERT_STM_API_CLIENTAUTH_P12_PASSWORD`
@@ -96,7 +96,7 @@ on:
   #   branches: [ "main" ]
 env:
   DATATRAILS_CLIENT_ID: ${{ secrets.DATATRAILS_CLIENT_ID }}
-  DATATRAILS_SECRET: ${{ secrets.DATATRAILS_SECRET }}
+  DATATRAILS_CLIENT_SECRET: ${{ secrets.DATATRAILS_CLIENT_SECRET }}
   DIGICERT_STM_CERTIFICATE_ID: ${{ secrets.DIGICERT_STM_CERTIFICATE_ID }}
   DIGICERT_STM_API_BASE_URI: ${{ secrets.DIGICERT_STM_API_BASE_URI }}
   DIGICERT_STM_API_CLIENTAUTH_P12_PASSWORD: ${{ secrets.DIGICERT_STM_API_CLIENTAUTH_P12_PASSWORD }}
@@ -120,21 +120,17 @@ jobs:
       - name: Register as a SCITT Signed Statement
          # Register the Signed Statement with DataTrails SCITT APIs
         id: register-compliance-scitt-signed-statement
-        uses: digicert/scitt-action@v0.2
+        uses: digicert/scitt-action@v0.4
         with:
           datatrails-client_id: ${{ env.DATATRAILS_CLIENT_ID }}
-          datatrails-secret: ${{ env.DATATRAILS_SECRET }}
+          datatrails-client_secret: ${{ env.DATATRAILS_CLIENT_SECRET }}
           subject: ${{ github.server_url }}/${{ github.repository }}@${{ github.sha }}
-          payload: "./buildOutput/attestation.json"
+          payload-file: "./buildOutput/attestation.json"
+          payload-location: 
           content-type: "application/vnd.unknown.attestation+json"
-      - name: upload-signed-statement
+      - name: upload-transparent-statement
         uses: actions/upload-artifact@v4
         with:
-          name: signed-statement
-          path: signed-statement.cbor
-      - name: upload-receipt
-        uses: actions/upload-artifact@v4
-        with:
-          name: receipt
-          path: receipt.cbor
+          name: transparent-statement
+          path: transparent-statement.cbor
   ```
