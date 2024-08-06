@@ -93,7 +93,9 @@ def submit_statement(
         timeout=REQUEST_TIMEOUT,
     )
     if response.status_code != 200:
-        logger.error("FAILED to submit statement: %s", response)
+        logger.error("FAILED to submit statement response.raw: %s", response.raw)
+        logger.error("FAILED to submit statement response.text: %s", response.text)
+        logger.error("FAILED to submit statement response.reason: %s", response.reason)
         logger.debug(response)
         sys.exit(1)
 
