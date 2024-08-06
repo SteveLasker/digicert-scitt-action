@@ -75,6 +75,7 @@ def get_dt_auth_header(logger: logging.Logger) -> str:
 def submit_statement(
     statement_file_path: str, headers: dict, logger: logging.Logger
 ) -> str:
+    logging.info("submit_statement()")
     """
     Given a Signed Statement CBOR file on disk, register it on the DataTrails
     Transparency Service over the SCITT interface
@@ -83,6 +84,7 @@ def submit_statement(
     with open(statement_file_path, "rb") as data_file:
         data = data_file.read()
 
+    logging.info("statement_file_path opened: %s", statement_file_path)
     # Make the POST request
     response = requests.post(
         "https://app.datatrails.ai/archivist/v1/publicscitt/entries",
@@ -91,7 +93,7 @@ def submit_statement(
         timeout=REQUEST_TIMEOUT,
     )
     if response.status_code != 200:
-        logger.error("FAILED to submit statement")
+        logger.error("FAILED to submit statement: %s", response.json())
         logger.debug(response)
         sys.exit(1)
 
