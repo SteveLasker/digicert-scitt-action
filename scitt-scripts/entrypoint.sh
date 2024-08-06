@@ -1,5 +1,7 @@
 #!/bin/bash -l
 
+set -e
+
 # echo "content-type:              " ${1}
 # echo "datatrails-client_id:      " ${2}
 # echo "datatrails-client_secret:  " ${3}
@@ -58,3 +60,4 @@ python /scripts/dump_cbor.py \
       --input $TRANSPARENT_STATEMENT_FILE
 
 # curl https://app.datatrails.ai/archivist/v2/publicassets/-/events?event_attributes.feed_id=$SUBJECT | jq
+
