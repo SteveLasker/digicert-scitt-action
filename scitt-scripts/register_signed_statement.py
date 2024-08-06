@@ -59,7 +59,7 @@ def get_dt_auth_header(logger: logging.Logger) -> str:
         },
         timeout=REQUEST_TIMEOUT,
     )
-    logging.error(response)
+    logging.info("Response: %s", response)
 
     if response.status_code != 200:
         logger.error("FAILED to acquire bearer token")
@@ -68,6 +68,7 @@ def get_dt_auth_header(logger: logging.Logger) -> str:
 
     # Format as a request header
     res = response.json()
+    logging.info("res: %s", res)
     return f'{res["token_type"]} {res["access_token"]}'
 
 
@@ -228,6 +229,7 @@ def main():
     auth_headers = {"Authorization": get_dt_auth_header(logger)}
 
     # Submit Signed Statement to DataTrails
+    logging.info("submit_statement:")
     op_id = submit_statement(args.signed_statement_file, auth_headers, logger)
     logging.info("Successfully submitted with Operation ID %s", op_id)
 
