@@ -232,6 +232,8 @@ def main():
 
     # Submit Signed Statement to DataTrails
     logging.info("submit_statement:")
+    logging.info("auth_headers: %s", auth_headers)
+    logging.info("signed_statement_file: %s", args.signed_statement_file)
     op_id = submit_statement(args.signed_statement_file, auth_headers, logger)
     logging.info("Successfully submitted with Operation ID %s", op_id)
 
