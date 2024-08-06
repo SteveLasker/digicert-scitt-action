@@ -47,6 +47,8 @@ def get_dt_auth_header(logger: logging.Logger) -> str:
         )
         sys.exit(1)
 
+    logging.info("CLIENT_ID and SECRET Complete")
+
     # Get token from the auth endpoint
     response = requests.post(
         "https://app.datatrails.ai/archivist/iam/v1/appidp/token",
@@ -57,6 +59,8 @@ def get_dt_auth_header(logger: logging.Logger) -> str:
         },
         timeout=REQUEST_TIMEOUT,
     )
+    logging.error(response)
+
     if response.status_code != 200:
         logger.error("FAILED to acquire bearer token")
         logger.debug(response)
