@@ -39,6 +39,8 @@ def get_dt_auth_header(logger: logging.Logger) -> str:
     client_id = os.environ.get("DATATRAILS_CLIENT_ID")
     client_secret = os.environ.get("DATATRAILS_CLIENT_SECRET")
 
+    logging.info("CLIENT_ID and SECRETs")
+
     if client_id is None or client_secret is None:
         logger.error(
             "Please configure your DataTrails credentials in the shell environment"
@@ -218,6 +220,7 @@ def main():
     logging.basicConfig(level=logging.getLevelName(args.log_level))
 
     # Get auth
+    logging.info("Get Auth Headers")
     auth_headers = {"Authorization": get_dt_auth_header(logger)}
 
     # Submit Signed Statement to DataTrails
