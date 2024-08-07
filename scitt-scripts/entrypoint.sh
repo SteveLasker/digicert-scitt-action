@@ -41,11 +41,10 @@ fi
 echo "Sign a SCITT Statement with key protected in DigiCert Software Trust Manager"
 
 python /scripts/create_signed_statement.py \
-
-  --subject $SUBJECT \
-  --payload-file $PAYLOAD_FILE \
   --content-type $CONTENT_TYPE \
-
+  --payload-file $PAYLOAD_FILE \
+  --payload-location $PAYLOAD_LOCATION \
+  --subject $SUBJECT \
   --output-file $SIGNED_STATEMENT_FILE
 
 if [ ! -f $SIGNED_STATEMENT_FILE ]; then
