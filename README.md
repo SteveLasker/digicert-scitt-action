@@ -35,21 +35,10 @@ To use a production supported implementation, please contact [DataTrails](https:
 **Required** Unique ID for the collection of statements about an artifact.
 For more info, see `subject` in the [IETF SCITT Terminology](https://datatracker.ietf.org/doc/html/draft-ietf-scitt-architecture#name-terminology).
 
-
 ### `transparent-statement-file`
 
 **Optional** The filename to save the transparent statement, which includes the signed-statement and the receipt
 **Default** 'transparent-statement.cbor'
-
-### `skip-receipt`
-
-**Optional** To skip receipt retrieval, set to 1
-**Default** '0'
-
-### `subject`
-
-**Required** Unique ID for the collection of statements about an artifact.
-For more info, see `subject` in the [IETF SCITT Terminology](https://datatracker.ietf.org/doc/html/draft-ietf-scitt-architecture#name-terminology).
 
 ## Secrets
 
