@@ -39,15 +39,11 @@ def get_dt_auth_header(logger: logging.Logger) -> str:
     client_id = os.environ.get("DATATRAILS_CLIENT_ID")
     client_secret = os.environ.get("DATATRAILS_CLIENT_SECRET")
 
-    logging.info("CLIENT_ID and SECRETs")
-
     if client_id is None or client_secret is None:
         logger.error(
             "Please configure your DataTrails credentials in the shell environment"
         )
         sys.exit(1)
-
-    logging.info("CLIENT_ID and SECRET Complete")
 
     # Get token from the auth endpoint
     response = requests.post(
@@ -62,13 +58,12 @@ def get_dt_auth_header(logger: logging.Logger) -> str:
     logging.info("Response: %s", response)
 
     if response.status_code != 200:
-        logger.error("FAILED to acquire bearer token")
+        logger.error("FAILED to acquire bearer token %s, %s", response.text, response.reason)
         logger.debug(response)
         sys.exit(1)
 
     # Format as a request header
     res = response.json()
-    logging.info("res: %s", res)
     return f'{res["token_type"]} {res["access_token"]}'
 
 
@@ -233,15 +228,14 @@ def main():
     auth_headers = {"Authorization": get_dt_auth_header(logger)}
 
     # Submit Signed Statement to DataTrails
-    logging.info("submit_statement:")
-    logging.info("auth_headers: %s", auth_headers)
-    logging.info("signed_statement_file: %s", args.signed_statement_file)
+    logging.info("submit_statement: %s", args.signed_statement_file, auth_headers)
+
     op_id = submit_statement(args.signed_statement_file, auth_headers, logger)
     logging.info("Successfully submitted with Operation ID %s", op_id)
 
     # If the client wants the Transparent Statement, wait for it
     if args.output_file != "":
-        logging.info("Now waiting for registration to complete")
+        logging.info("Waiting for registration to complete")
 
         # Wait for the registration to complete
         try:
