@@ -23,6 +23,7 @@ inputs:
     description: 'The filename to save the cbor transparent statement, which includes the signed-statement and the receipt'
     required: false
     default: 'transparent-statement.cbor'
+
 outputs:
   token: # id of output
     description: 'the token used to authenticate'
@@ -37,3 +38,4 @@ runs:
     - ${{ inputs.payload-location }}
     - ${{ inputs.subject }}
     - ${{ inputs.transparent-statement-file }}
+

@@ -19,6 +19,7 @@ SUBJECT=${6}
 TRANSPARENT_STATEMENT_FILE=${7}
 
 SIGNED_STATEMENT_FILE="signed-statement.cbor"
+
 TOKEN_FILE="./bearer-token.txt"
 
 if [ ! -f $PAYLOAD_FILE ]; then
@@ -27,6 +28,7 @@ if [ ! -f $PAYLOAD_FILE ]; then
 fi
 
 # echo "Create an access token"
+
 /scripts/create-token.sh $DATATRAILS_CLIENT_ID \
   $DATATRAILS_CLIENT_SECRET \
   $TOKEN_FILE
@@ -39,9 +41,11 @@ fi
 echo "Sign a SCITT Statement with key protected in DigiCert Software Trust Manager"
 
 python /scripts/create_signed_statement.py \
+
   --subject $SUBJECT \
   --payload-file $PAYLOAD_FILE \
   --content-type $CONTENT_TYPE \
+
   --output-file $SIGNED_STATEMENT_FILE
 
 if [ ! -f $SIGNED_STATEMENT_FILE ]; then
@@ -60,4 +64,3 @@ python /scripts/dump_cbor.py \
       --input $TRANSPARENT_STATEMENT_FILE
 
 # curl https://app.datatrails.ai/archivist/v2/publicassets/-/events?event_attributes.feed_id=$SUBJECT | jq
-
