@@ -26,10 +26,6 @@ To use a production supported implementation, please contact [DataTrails](https:
 
 **Optional** Location the content of the payload may be stored.
 
-    description: 'The filename to save the cbor transparent statement, which includes the signed-statement and the receipt'
-    required: false
-    default: 'transparent-statement.cbor'
-
 ### `subject`
 
 **Required** Unique ID for the collection of statements about an artifact.
@@ -139,7 +135,6 @@ jobs:
           payload-location: ${{ steps.upload-attestation.outputs.artifact-url }}
           subject: ${{ github.server_url }}/${{ github.repository }}@${{ github.sha }}
       - name: upload-transparent-statement
-
         uses: actions/upload-artifact@v4
         with:
           name: transparent-statement
