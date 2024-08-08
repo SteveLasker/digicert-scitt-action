@@ -4,12 +4,6 @@ inputs:
   content-type:
     description: 'The payload content type (iana mediaType) to be registered on the SCITT Service (eg: application/spdx+json, application/vnd.cyclonedx+json, Scan Result, Attestation)'
     required: true
-  datatrails-client_id:
-    description: 'The CLIENT_ID used to access the DataTrails SCITT APIs'
-    required: true
-  datatrails-client_secret:
-    description: 'The SECRET used to access the DataTrails SCITT APIs'
-    required: true
   payload-file:
     description: 'The payload file to be registered on the SCITT Service (eg: SBOM, Scan Result, Attestation)'
     required: true
@@ -32,8 +26,6 @@ runs:
   image: 'Dockerfile'
   args:
     - ${{ inputs.content-type }}
-    - ${{ inputs.datatrails-client_id }}
-    - ${{ inputs.datatrails-client_secret }}
     - ${{ inputs.payload-file }}
     - ${{ inputs.payload-location }}
     - ${{ inputs.subject }}

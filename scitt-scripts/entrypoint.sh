@@ -3,20 +3,16 @@
 set -e
 
 # echo "content-type:              " ${1}
-# echo "datatrails-client_id:      " ${2}
-# echo "datatrails-client_secret:  " ${3}
-# echo "payload-file:              " ${4}
-# echo "payload-location"          " ${5}
-# echo "subject:                   " ${6}
-# echo "transparent-statement-file:" ${7}
+# echo "payload-file:              " ${2}
+# echo "payload-location"          " ${3}
+# echo "subject:                   " ${4}
+# echo "transparent-statement-file:" ${5}
 
 CONTENT_TYPE=${1}
-export DATATRAILS_CLIENT_ID=${2}
-export DATATRAILS_CLIENT_SECRET=${3}
-PAYLOAD_FILE=${4}
-PAYLOAD_LOCATION=${5}
-SUBJECT=${6}
-TRANSPARENT_STATEMENT_FILE=${7}
+PAYLOAD_FILE=${2}
+PAYLOAD_LOCATION=${3}
+SUBJECT=${5}
+TRANSPARENT_STATEMENT_FILE=${5}
 
 SIGNED_STATEMENT_FILE="signed-statement.cbor"
 
