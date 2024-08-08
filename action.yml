@@ -18,7 +18,6 @@ inputs:
     required: false
     default: 'transparent-statement.cbor'
 
-outputs:
 runs:
   using: 'docker'
   image: 'Dockerfile'
