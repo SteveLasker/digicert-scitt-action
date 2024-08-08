@@ -123,14 +123,12 @@ jobs:
         with:
           name: attestation.json
           path: ./buildOutput/attestation.json
-      - name: Sign & Register as a SCITT Signed Statement
+      - name: SMCTL Sign & Register as a SCITT Signed Statement
          # Register the DigiCert Signed Statement with the DataTrails SCITT APIs
         id: register-compliance-scitt-signed-statement
         uses: digicert/scitt-action@v0.4
         with:
           content-type: "application/vnd.unknown.attestation+json"
-          datatrails-client_id: ${{ env.DATATRAILS_CLIENT_ID }}
-          datatrails-client_secret: ${{ env.DATATRAILS_CLIENT_SECRET }}
           payload-file: "./buildOutput/attestation.json"
           payload-location: ${{ steps.upload-attestation.outputs.artifact-url }}
           subject: ${{ github.server_url }}/${{ github.repository }}@${{ github.sha }}
