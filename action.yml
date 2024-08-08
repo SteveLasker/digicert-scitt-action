@@ -19,8 +19,6 @@ inputs:
     default: 'transparent-statement.cbor'
 
 outputs:
-  token: # id of output
-    description: 'the token used to authenticate'
 runs:
   using: 'docker'
   image: 'Dockerfile'
