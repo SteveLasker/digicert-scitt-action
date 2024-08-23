@@ -1,6 +1,6 @@
 MIT License
 
-Copyright (c) 2019-2022 DataTrails
+Copyright (c) 2019-2024 DataTrails
 Copyright (c) 2024 DigiCert
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
